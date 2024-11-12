@@ -1,4 +1,6 @@
 # TESK+ - Task Management Application
+![image](https://github.com/user-attachments/assets/baa9fb2e-0069-4ead-a4ab-04885299fbae)
+
 
 TESK+ é um aplicativo simples e intuitivo para gerenciamento de tarefas pessoais. Ele permite que o usuário organize suas atividades, visualize o progresso de cada tarefa e mantenha um controle das tarefas concluídas. Desenvolvido para facilitar a produtividade, TESK+ é acessível e funcional para todos que desejam gerenciar suas tarefas de maneira eficaz.
 
