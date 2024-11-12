@@ -99,9 +99,19 @@ class cadastro extends React.Component {
     const { email, senha, nome, cpf } = this.state;
 
     // Verifica se todos os campos foram preenchidos
-    if (!email || !senha || !nome || !cpf) {
+    if (!email || !senha || !nome || !cpf ) {
       alert("Por favor, preencha todos os campos.");
       return;
+    }
+
+    //verifica se cpf possui 11 digitos
+    if(cpf.length !== 11){
+      alert("CPF incorreto, deve conter 11 digitos !");
+    }
+
+    //verifica o tamanho minimo da senha
+    if(senha.length < 5){
+      alert("Senha pequena, no minimo 5 digitos");
     }
 
     try {
@@ -147,7 +157,7 @@ class cadastro extends React.Component {
         <TextInput style={styles.caixaText} onChangeText={(texto) => this.setState({ nome: texto })}
           autoCapitalize="words" value={this.state.nome}/>
 
-        <Text style={styles.texto}>Insira o seu CPF:</Text>
+        <Text style={styles.texto}>Insira o seu CPF (Sem "." e "-"):</Text>
         <TextInput style={styles.caixaText} onChangeText={(texto) => this.setState({ cpf: texto })}
           keyboardType="numeric" value={this.state.cpf}/>
 
@@ -173,7 +183,7 @@ class cadastro extends React.Component {
         >
           <Text style={styles.botaoTexto}>Voltar</Text>
         </TouchableOpacity>
-        <Text style={{display: 'flex',marginTop: 220,fontFamily: 'bold', fontSize: 15,fontWeight: 'bold'}}>Developed By</Text>
+        <Text style={{display: 'flex',marginTop: 205,fontFamily: 'bold', fontSize: 15,fontWeight: 'bold'}}>Developed By</Text>
         <Text style={{display: 'flex',marginTop: 0,fontFamily: 'bold', fontSize: 15,fontWeight: 'bold'}}>Rafael Dias</Text>
       </View>
     );
@@ -214,7 +224,7 @@ class PaginaTarefas extends React.Component {
       const tarefas = tarefasSalvas ? JSON.parse(tarefasSalvas) : [];
       //filtra as tarefas por cpf e status diferente de concluidas
       const tarefasFiltradas = tarefas.filter(
-        tarefa => tarefa.statusAtivade !== "Concluída" && tarefa.cpfUser === this.state.cpfUser
+        tarefa => tarefa.statusAtividade !== "Concluída" && tarefa.cpfUser === this.state.cpfUser
       );
       //muda o estado da variavel
       this.setState({ tarefas: tarefasFiltradas });
@@ -259,12 +269,19 @@ class DescricaoTarefa extends React.Component {
 
   //função onde altera o status da atividade acessada para em andamento
   iniciarTarefa = async () => {
+    //atualiza o status da atividade
     await this.atualizarStatus("Em andamento");
   };
 
   //função onde altera o status da atividade acessada para concluida
   concluirTarefa = async () => {
+    //captura a data atual
+    const dataConclusao = new Date().toLocaleDateString('pt-BR');
+    //atualiza o status da tarefa
     await this.atualizarStatus("Concluída");
+    //atualiza a data de conclusão da tarefa
+    await this.atualizarData(dataConclusao);
+    //retorna a pagina inicial
     this.props.navigation.goBack();
   };
 
@@ -299,7 +316,7 @@ class DescricaoTarefa extends React.Component {
             //Verifica se o ID da tarefa corresponde ao ID da tarefa atual
             if (tarefa.id === this.props.route.params.id) {
                 //Retorna a tarefa com o status atualizado
-                return { ...tarefa, statusAtivade: novoStatus };
+                return { ...tarefa, statusAtividade: novoStatus };
             }
             // Retorna a tarefa inalterada se o ID não corresponder
             return tarefa;
@@ -314,11 +331,37 @@ class DescricaoTarefa extends React.Component {
     }
   };
 
+  // Função auxiliar para atualizar a data de conclusão da tarefa no AsyncStorage
+  atualizarData = async (novaData) => {
+    try {
+        //Carrega as tarefas salvas do AsyncStorage
+        const tarefasSalvas = await AsyncStorage.getItem('tarefas');
+        //Converte as tarefas salvas em array
+        const tarefas = tarefasSalvas ? JSON.parse(tarefasSalvas) : [];
+        //Atualiza a data da tarefa especificada
+        const novasTarefas = tarefas.map(tarefa => {
+            //Verifica se o ID da tarefa corresponde ao ID da tarefa atual
+            if (tarefa.id === this.props.route.params.id) {
+                //Retorna a tarefa com o status atualizado
+                return { ...tarefa, dataConcluida: novaData };
+            }
+            // Retorna a tarefa inalterada se o ID não corresponder
+            return tarefa;
+        });
+        //carrega o array atualizado no AsyncStorage com o novo status
+        await AsyncStorage.setItem('tarefas', JSON.stringify(novasTarefas));
+  
+    } catch (error) {
+        // Exibe uma mensagem de erro caso ocorra falha ao atualizar o status
+        alert("Erro ao atualizar a data da tarefa.");
+    }
+  };
+
   //renderiza a pagina de informações
   render() {
 
     //retorna as informações da tarefa escolhida
-    const { nomeAtividade, descricao, prioridade, dataLimite, nomeCriador,dataCriacao, statusAtivade } = this.props.route.params;
+    const { nomeAtividade, descricao, prioridade, dataLimite, nomeCriador,dataCriacao, statusAtividade } = this.props.route.params;
 
     return (
       <View style={styles.container2}>
@@ -329,7 +372,7 @@ class DescricaoTarefa extends React.Component {
         <Text style={styles.texto}>Data Criação: {dataCriacao}</Text>
         <Text style={styles.texto}>Data Limite: {dataLimite}</Text>
         <Text style={styles.texto}>Criador: {nomeCriador}</Text>
-        <Text style={styles.texto}>Status: {statusAtivade}</Text>
+        <Text style={styles.texto}>Status: {statusAtividade}</Text>
 
         <TouchableOpacity 
           style={styles.botao} 
@@ -371,8 +414,9 @@ class PaginaCriar extends React.Component {
       prioridade: "",
       dataLimite: "",
       nomeCriador: undefined,
-      statusAtivade: "Não iniciada",
+      statusAtividade: "Não iniciada",
       cpfUser: undefined,
+      dataConcluida: "",
     };
   }
 
@@ -415,7 +459,7 @@ class PaginaCriar extends React.Component {
       dataCriacao, // data atual da criação da atividade
       dataLimite, // data limite da atividade
       nomeCriador, // nome do criador da atividade
-      statusAtivade: "Não iniciada", // status iniciado como não iniciada
+      statusAtividade: "Não iniciada", // status iniciado como não iniciada
       cpfUser
     };
 
@@ -506,7 +550,7 @@ class paginaAtividadeConcluida extends React.Component {
       const tarefas = tarefasSalvas ? JSON.parse(tarefasSalvas) : [];
       //filtra as tarefas por cpf e status concluida
       const tarefasFiltradas = tarefas.filter(
-        tarefa => tarefa.statusAtivade === "Concluída" && tarefa.cpfUser === this.state.cpfUser
+        tarefa => tarefa.statusAtividade === "Concluída" && tarefa.cpfUser === this.state.cpfUser
       );
       //altera o estado da variavel
       this.setState({ tarefasConcluidas: tarefasFiltradas });
@@ -567,7 +611,7 @@ class DescricaoTarefaConcluidas extends React.Component {
   //renderiza a pagina
   render() {
     //retorna as informações da tarefa escolhida
-    const { nomeAtividade, descricao, prioridade, dataLimite, dataCriacao,nomeCriador, statusAtivade } = this.props.route.params;
+    const { nomeAtividade, descricao, prioridade, dataLimite, dataCriacao,nomeCriador, statusAtividade, dataConcluida} = this.props.route.params;
     return (
       <View style={styles.container2}>
         <Text style={{fontFamily: 'Bold',fontWeight: 'bold',fontSize: 25, marginBottom: 25, marginTop: -300}}>Descrição da Tarefa</Text>
@@ -577,7 +621,8 @@ class DescricaoTarefaConcluidas extends React.Component {
         <Text style={styles.texto}>Data Criação: {dataCriacao}</Text>
         <Text style={styles.texto}>Data Limite: {dataLimite}</Text>
         <Text style={styles.texto}>Criador: {nomeCriador}</Text>
-        <Text style={styles.texto}>Status: {statusAtivade}</Text>
+        <Text style={styles.texto}>Status: {statusAtividade}</Text>
+        <Text style={styles.texto}>Data de Conclusão: {dataConcluida}</Text>
 
         <TouchableOpacity 
           style={styles.botao} 
@@ -728,6 +773,7 @@ const styles = StyleSheet.create({
     fontFamily: 'bold',
     fontSize: 17,
     fontWeight: 'bold',
+    marginBottom: 5
   },
   imagem: {
     width: 350,     // Largura da imagem
