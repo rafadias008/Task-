@@ -100,3 +100,5 @@ Nesta página, há um botão para excluir a tarefa e outro para voltar à págin
 
 ## Conclusão
 TESK+ é ideal para qualquer pessoa que deseje organizar e acompanhar o progresso de suas atividades de maneira eficiente. Com uma interface simples e um conjunto de funcionalidades objetivas, o TESK+ ajuda o usuário a gerenciar suas tarefas de forma prática, proporcionando um aumento de produtividade e melhor controle do seu dia a dia.
+
+IDE recomendada pra uso Expo.Go. Link para o stack do projeto: https://snack.expo.dev/@rafadias08/projeto-react
