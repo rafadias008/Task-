@@ -107,11 +107,13 @@ class cadastro extends React.Component {
     //verifica se cpf possui 11 digitos
     if(cpf.length !== 11){
       alert("CPF incorreto, deve conter 11 digitos !");
+      return;
     }
 
     //verifica o tamanho minimo da senha
     if(senha.length < 5){
       alert("Senha pequena, no minimo 5 digitos");
+      return;
     }
 
     try {
@@ -245,6 +247,8 @@ class PaginaTarefas extends React.Component {
         {this.state.tarefas.map((tarefa) => (
           <View key={tarefa.id} style={styles.cardTarefa}>
             <Text style={styles.texto}>{tarefa.nomeAtividade}</Text>
+            <Text style={styles.texto}>Prioridade:{tarefa.prioridade}</Text>
+            <Text style={styles.texto}>Status:{tarefa.statusAtividade}</Text>
             <TouchableOpacity 
               style={styles.botao1} 
               onPress={() => this.props.navigation.navigate('DescricaoTarefa', tarefa)}
@@ -411,7 +415,7 @@ class PaginaCriar extends React.Component {
     this.state = {
       nomeAtividade: "",
       descricao: "",
-      prioridade: "",
+      prioridade: undefined,
       dataLimite: "",
       nomeCriador: undefined,
       statusAtividade: "Não iniciada",
@@ -441,6 +445,11 @@ class PaginaCriar extends React.Component {
     //verifica se todos os campos foram preenchidos
     if (!nomeAtividade || !descricao || !prioridade || !dataLimite || !nomeCriador || !cpfUser) {
       alert("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    if(prioridade < 0 || prioridade > 10){
+      alert("Prioridade incorreta, somente entre 1 a 10 !");
       return;
     }
 
@@ -476,7 +485,12 @@ class PaginaCriar extends React.Component {
       //salva a array atualizada novamente no AsyncStorage
       await AsyncStorage.setItem('tarefas', JSON.stringify(tarefas));
       alert("Tarefa criada com sucesso!");
-      
+      this.setState({
+        nomeAtividade: "",
+        descricao: "",
+        prioridade: "",
+        dataLimite: ""
+      });
       // Chama a função atualizarTarefas da PaginaTarefas
       this.props.atualizarTarefas();
       this.props.navigation.goBack();
@@ -496,7 +510,7 @@ class PaginaCriar extends React.Component {
         <Text style={styles.texto}>Descrição da atividade:</Text>
         <TextInput style={{borderColor: 'black',borderWidth: 2,borderRadius: 3,width: 250,height: 25,marginBottom: 10}} onChangeText={(texto) => this.setState({ descricao: texto })} value={this.state.descricao}/>
 
-        <Text style={styles.texto}>Prioridade da Atividade (0 - 10):</Text>
+        <Text style={styles.texto}>Prioridade da Atividade (1 - 10):</Text>
         <TextInput style={{borderColor: 'black',borderWidth: 2,borderRadius: 3,width: 250,height: 25,marginBottom: 10}} onChangeText={(texto) => this.setState({ prioridade: texto })} keyboardType="numeric" value={this.state.prioridade}/>
 
         <Text style={styles.texto}>Data Limite da Atividade</Text>
