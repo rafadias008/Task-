@@ -12,6 +12,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 class login extends React.Component{
+  //construtor da classe
   constructor(props){
     super(props)
     this.state = {
@@ -19,19 +20,24 @@ class login extends React.Component{
       senha: undefined
     }
   }
-
+  
+  //função para ler os dados inseridos e verificar se o cliente existe para logar
   async ler() {
     try {
+      //carrega os dados dos clientes
       const clienteData = await AsyncStorage.getItem(this.state.email);
+      //verifica se os dados são diferentes de NULL
       if (clienteData != null) {
+        //caarrega os dados de password, nome e cpf dos clientes
         const { password,nome ,cpf} = JSON.parse(clienteData);
+        //verifica se as senhas digitas e email corresponde
         if (password === this.state.senha) {
           alert("Logado!!!");
           //armazena o nome do usuario
           await AsyncStorage.setItem("nomeUser", nome);
           //armazena cpf do usuario
           await AsyncStorage.setItem("cpfUser", cpf);
-
+          //inicia o app principal
           this.props.navigation.replace('AppPrincipal');
         } else {
           alert("Senha Incorreta!");
@@ -44,6 +50,7 @@ class login extends React.Component{
     }
   }
 
+  //renderiza a pagina
   render(){
     return(
     <View style={styles.container}>
@@ -174,6 +181,7 @@ class cadastro extends React.Component {
 }
 
 class PaginaTarefas extends React.Component {
+  //construtor da classe
   constructor(props) {
     super(props);
     this.state = {
@@ -182,12 +190,13 @@ class PaginaTarefas extends React.Component {
     };
   }
 
+  //carrega o cpf do usuario logado e das tarefas
   async componentDidMount() {
-    // Carrega o CPF do usuário logado
+    //carrega o CPF do usuário logado
     const cpfUser = await AsyncStorage.getItem("cpfUser");
     this.setState({ cpfUser }, () => this.carregarTarefas()); // Chama carregarTarefas após definir o CPF
 
-    // Listener para recarregar tarefas ao retornar para a tela
+    //Listaner para recarregar tarefas ao retornar para a tela
     this.focusListener = this.props.navigation.addListener('focus', () => {
       this.carregarTarefas();
     });
@@ -199,19 +208,22 @@ class PaginaTarefas extends React.Component {
 
   async carregarTarefas() {
     try {
+      //carrega as tarefas salvas
       const tarefasSalvas = await AsyncStorage.getItem('tarefas');
+      //tranforma as tarefas em uma array 
       const tarefas = tarefasSalvas ? JSON.parse(tarefasSalvas) : [];
-
+      //filtra as tarefas por cpf e status diferente de concluidas
       const tarefasFiltradas = tarefas.filter(
         tarefa => tarefa.statusAtivade !== "Concluída" && tarefa.cpfUser === this.state.cpfUser
       );
-
+      //muda o estado da variavel
       this.setState({ tarefas: tarefasFiltradas });
     } catch (error) {
       alert("Erro ao carregar tarefas.");
     }
   }
 
+  //renderização da pagina
   render() {
     return (
       <ScrollView contentContainerStyle={{ padding: 16,flexGrow: 1  }} style={styles.container1}  >
@@ -472,9 +484,9 @@ class paginaAtividadeConcluida extends React.Component {
 
   //Carrega as tarefas na pagina
  async componentDidMount() {
-    // Carrega o CPF do usuário logado
+    //carrega o CPF do usuário logado
     const cpfUser = await AsyncStorage.getItem("cpfUser");
-    this.setState({ cpfUser }, () => this.carregarTarefasConcluidas()); // Chama carregarTarefas após definir o CPF
+    this.setState({ cpfUser }, () => this.carregarTarefasConcluidas()); //chama carregarTarefas após definir o CPF
 
     // Listener para recarregar tarefas ao retornar para a tela
     this.focusListener = this.props.navigation.addListener('focus', () => {
@@ -488,13 +500,15 @@ class paginaAtividadeConcluida extends React.Component {
 
   async carregarTarefasConcluidas() {
     try {
+      //carrega as tarefas salvas
       const tarefasSalvas = await AsyncStorage.getItem('tarefas');
+      //tranforma as tarefas em um array
       const tarefas = tarefasSalvas ? JSON.parse(tarefasSalvas) : [];
-
+      //filtra as tarefas por cpf e status concluida
       const tarefasFiltradas = tarefas.filter(
         tarefa => tarefa.statusAtivade === "Concluída" && tarefa.cpfUser === this.state.cpfUser
       );
-
+      //altera o estado da variavel
       this.setState({ tarefasConcluidas: tarefasFiltradas });
     } catch (error) {
       alert("Erro ao carregar tarefas.");
