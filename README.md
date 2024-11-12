@@ -17,6 +17,8 @@ TESK+ é um aplicativo simples e intuitivo para gerenciamento de tarefas pessoai
 
 ### 1. Página de Login
 A página de login permite que o usuário acesse o TESK+ inserindo seu email e senha. Se o login for bem-sucedido, o usuário é redirecionado para a página principal do aplicativo, onde poderá visualizar suas tarefas.
+![WhatsApp Image 2024-11-12 at 12 38 45 (4)](https://github.com/user-attachments/assets/cceaeebc-57fe-4ba0-8a71-920d207e3c1a)
+
 
 ### 2. Página de Cadastro
 Na página de cadastro, o usuário cria uma conta inserindo as seguintes informações:
