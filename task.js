@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextInput, Text, View, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { TextInput, Text, View, Button, StyleSheet, TouchableOpacity, Image , Vibration} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
@@ -29,10 +29,12 @@ class login extends React.Component{
       //verifica se os dados são diferentes de NULL
       if (clienteData != null) {
         //caarrega os dados de password, nome e cpf dos clientes
-        const { password,nome ,cpf} = JSON.parse(clienteData);
+        const { password,nome ,cpf,apelido} = JSON.parse(clienteData);
         //verifica se as senhas digitas e email corresponde
         if (password === this.state.senha) {
-          alert("Logado!!!");
+          //vibração de 100 milesimos de segundos ao realizar a ação
+          Vibration.vibrate(100);
+          alert("Bem vindo, " + apelido);
           //armazena o nome do usuario
           await AsyncStorage.setItem("nomeUser", nome);
           //armazena cpf do usuario
@@ -61,7 +63,7 @@ class login extends React.Component{
           keyboardType="email-address" ></TextInput>
       <Text style={styles.texto}>{"Senha:"}</Text>
       <TextInput style={styles.caixaText} onChangeText={(password) => this.setState({ senha: password })}
-          secureTextEntry={true} keyboardType="numeric"></TextInput>
+          secureTextEntry={true} keyboardType="words"></TextInput>
       <TouchableOpacity 
           style={styles.botao} 
           onPress={()=>this.ler()}
@@ -90,16 +92,17 @@ class cadastro extends React.Component {
       email: "",
       senha: "",
       nome: "",
-      cpf: ""
+      cpf: "",
+      apelido: ""
     };
   }
 
   //função utilizada para gravar o usuario
   async gravar() {
-    const { email, senha, nome, cpf } = this.state;
+    const { email, senha, nome, cpf,apelido } = this.state;
 
     // Verifica se todos os campos foram preenchidos
-    if (!email || !senha || !nome || !cpf ) {
+    if (!email || !senha || !nome || !cpf || !apelido) {
       alert("Por favor, preencha todos os campos.");
       return;
     }
@@ -111,8 +114,8 @@ class cadastro extends React.Component {
     }
 
     //verifica o tamanho minimo da senha
-    if(senha.length < 5){
-      alert("Senha pequena, no minimo 5 digitos");
+    if(senha.length < 5 || senha.length > 12){
+      alert("Senha pequena, no minímo 5 e máximo 12 digitos");
       return;
     }
 
@@ -132,8 +135,8 @@ class cadastro extends React.Component {
       }
 
       // Salva os dados do usuário no formato { password, nome, cpf }
-      await AsyncStorage.setItem(email, JSON.stringify({ password: senha, nome, cpf }));
-      await AsyncStorage.setItem(cpf, JSON.stringify({ email, password: senha, nome }));
+      await AsyncStorage.setItem(email, JSON.stringify({ password: senha, nome, cpf,apelido }));
+      await AsyncStorage.setItem(cpf, JSON.stringify({ email, password: senha, nome,apelido }));
 
       alert("Usuário Cadastrado com Sucesso!");
 
@@ -142,7 +145,8 @@ class cadastro extends React.Component {
         email: "",
         senha: "",
         nome: "",
-        cpf: ""
+        cpf: "",
+        apelido: ""
       });
     } catch (erro) {
       alert("Erro ao cadastrar usuário!");
@@ -159,6 +163,10 @@ class cadastro extends React.Component {
         <TextInput style={styles.caixaText} onChangeText={(texto) => this.setState({ nome: texto })}
           autoCapitalize="words" value={this.state.nome}/>
 
+        <Text style={styles.texto}>Como quer ser chamado:</Text>
+        <TextInput style={styles.caixaText} onChangeText={(texto) => this.setState({ apelido: texto })}
+          autoCapitalize="words" value={this.state.apelido}/>
+
         <Text style={styles.texto}>Insira o seu CPF (Sem "." e "-"):</Text>
         <TextInput style={styles.caixaText} onChangeText={(texto) => this.setState({ cpf: texto })}
           keyboardType="numeric" value={this.state.cpf}/>
@@ -170,7 +178,7 @@ class cadastro extends React.Component {
 
         <Text style={styles.texto}>Crie sua Senha:</Text>
         <TextInput style={styles.caixaText} onChangeText={(texto) => this.setState({ senha: texto })}
-          secureTextEntry={true} keyboardType="numeric" value={this.state.senha}/>
+          secureTextEntry={true} keyboardType="words" value={this.state.senha}/>
 
 
         <TouchableOpacity 
@@ -185,7 +193,7 @@ class cadastro extends React.Component {
         >
           <Text style={styles.botaoTexto}>Voltar</Text>
         </TouchableOpacity>
-        <Text style={{display: 'flex',marginTop: 205,fontFamily: 'bold', fontSize: 15,fontWeight: 'bold'}}>Developed By</Text>
+        <Text style={{display: 'flex',marginTop: 160,fontFamily: 'bold', fontSize: 15,fontWeight: 'bold'}}>Developed By</Text>
         <Text style={{display: 'flex',marginTop: 0,fontFamily: 'bold', fontSize: 15,fontWeight: 'bold'}}>Rafael Dias</Text>
       </View>
     );
@@ -273,12 +281,18 @@ class DescricaoTarefa extends React.Component {
 
   //função onde altera o status da atividade acessada para em andamento
   iniciarTarefa = async () => {
+
+    //vibração de 100 milesimos de segundos ao realizar a ação
+      Vibration.vibrate(100);
     //atualiza o status da atividade
     await this.atualizarStatus("Em andamento");
   };
 
   //função onde altera o status da atividade acessada para concluida
   concluirTarefa = async () => {
+
+    //vibração de 100 milesimos de segundos ao realizar a ação
+    Vibration.vibrate(100);
     //captura a data atual
     const dataConclusao = new Date().toLocaleDateString('pt-BR');
     //atualiza o status da tarefa
@@ -292,6 +306,8 @@ class DescricaoTarefa extends React.Component {
 
   apagarTarefa = async () => {
     try {
+      //vibração de 100 milesimos de segundos ao realizar a ação
+      Vibration.vibrate(100);
       //obtem as tarefas salvas
       const tarefasSalvas = await AsyncStorage.getItem('tarefas');
       //transforma a tarefas em array 
@@ -484,6 +500,8 @@ class PaginaCriar extends React.Component {
 
       //salva a array atualizada novamente no AsyncStorage
       await AsyncStorage.setItem('tarefas', JSON.stringify(tarefas));
+      //vibração de 100 milesimos de segundos ao realizar a ação
+      Vibration.vibrate(100);
       alert("Tarefa criada com sucesso!");
       this.setState({
         nomeAtividade: "",
@@ -606,6 +624,8 @@ class DescricaoTarefaConcluidas extends React.Component {
 
     apagarTarefa = async () => {
     try {
+      //vibração de 100 milesimos de segundos ao realizar a ação
+      Vibration.vibrate(100);
       //obtem as tarefas salvas
       const tarefasSalvas = await AsyncStorage.getItem('tarefas');
       //transforma a tarefas em array 
