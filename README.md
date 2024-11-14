@@ -27,6 +27,7 @@ Na página de cadastro, o usuário cria uma conta inserindo as seguintes informa
 - **Email**: Para autenticação e identificação do usuário.
 - **CPF**: Deve conter 11 dígitos (somente números, sem pontos ou traços).
 - **Nome**: Nome completo do usuário.
+- **Apelido**: Nome que o usuário gostaria de utilizar.
 - **Senha**: Mínimo de 5 dígitos numéricos para segurança básica.
 
 Após o cadastro, os campos são limpos automaticamente para que o usuário possa iniciar um novo cadastro ou acessar a página de login.
